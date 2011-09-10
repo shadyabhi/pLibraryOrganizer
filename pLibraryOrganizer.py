@@ -15,7 +15,7 @@ if sys.version_info>(3,0,0):
         print("Wrong python verion. Its not ported to python3 yet. Use python2")
         exit(1)
 
-class PAudioOrganizer:
+class PLibraryOrganizer:
     def __init__(self):
         pass
 
@@ -41,6 +41,12 @@ class PAudioOrganizer:
         """Recurse the whole music directory so that we can operate on each file"""
         for dirpath, dirnames, filenames in os.walk(str(self.args.directory)):
             print("Now working in directory -> " + dirpath)
+            
+            #Delete the directory if its empty in the beginning itself
+            if not filenames:
+                os.rmdir(dirpath)
+                if self.args.verbose: print dirpath + "deleted as its empty"
+
             for file in filenames:
                 src = dirpath+"/"+file
                 music_file = audiofile.AudioFile(src)
@@ -90,5 +96,5 @@ class PAudioOrganizer:
         
 
 if __name__ == "__main__":
-        app = PAudioOrganizer()
+        app = PLibraryOrganizer()
         app.sort()
