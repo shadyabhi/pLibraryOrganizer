@@ -1,12 +1,23 @@
+#!/usr/bin/python2
+
+#Author: abhijeet.1989@gmail.com (shadyabhi)
+
+
 import audiofile
 import argparse
 import sys
 import os
 from shutil import move
+from sys import version_info, exit
+
+#Uses python2
+if sys.version_info>(3,0,0):
+        print("Wrong python verion. Its not ported to python3 yet. Use python2")
+        exit(1)
 
 class PAudioOrganizer:
     def __init__(self):
-        self.get_args()
+        pass
 
     def get_args(self):
         """Get all the arguments from the command line"""
@@ -23,13 +34,13 @@ class PAudioOrganizer:
         if self.args.directory[-1] is not "/": self.args.directory = self.args.directory+"/"
         
         if self.args.verbose:
-            print "Directory to work on: " + str(self.args.directory)
-            print "Format to use: "+str(self.args.format)
+            print("Directory to work on: " + str(self.args.directory))
+            print("Format to use: "+str(self.args.format))
             
     def recurse_directory(self):
         """Recurse the whole music directory so that we can operate on each file"""
         for dirpath, dirnames, filenames in os.walk(str(self.args.directory)):
-            print "Now working in directory -> " + dirpath
+            print("Now working in directory -> " + dirpath)
             for file in filenames:
                 src = dirpath+"/"+file
                 music_file = audiofile.AudioFile(src)
@@ -51,12 +62,10 @@ class PAudioOrganizer:
                 dest = dest.replace("%album%", meta_data[1].replace("/"," "))
                 dest = dest.replace("%title%", meta_data[2].replace("/"," "))
                 
-                if self.args.verbose: print "PERFORMING: " + src + " --> " + dest
+                if self.args.verbose: print("PERFORMING: " + src + " --> " + dest)
                 
                 self.move_wrapper(src, dest, music_file)
-                
-                
-                                   
+                                              
     def move_wrapper(self, src, dest, music_file):
         """Wrapper to move a file which handles all conditions"""
         #Strip the directory name.
@@ -74,12 +83,12 @@ class PAudioOrganizer:
         except OSError:
             #Directory not empty so we want to pass it until it gets empty.
             pass
-
         
-    def main(self):
+    def sort(self):
+        self.get_args()
         self.recurse_directory()
         
 
 if __name__ == "__main__":
-    app = PAudioOrganizer()
-    app.main()
+        app = PAudioOrganizer()
+        app.sort()
