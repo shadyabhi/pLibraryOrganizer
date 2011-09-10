@@ -14,11 +14,14 @@ class PAudioOrganizer:
         parser.add_argument('-f', '--format', nargs = 1, required=True, help='Enter format for organizing the music') 
         parser.add_argument('-d', '--directory', nargs = '?', default = './', help='Enter the directory root. Default is ./')
         parser.add_argument('-v', '--verbose', action='store_true', help='For more verbose output')
-
+        parser.add_argument('-et', '--edittitle', nargs = 2, help="Replace in Title")
+        parser.add_argument('-ea', '--editartist', nargs = 2, help="Replace in Artist")
+        parser.add_argument('-eA', '--editalbum', nargs = 2, help="Replace in Album")
+        
         self.args = parser.parse_args(sys.argv[1:])
         #Correct the parameters
         if self.args.directory[-1] is not "/": self.args.directory = self.args.directory+"/"
-
+        
         if self.args.verbose:
             print "Directory to work on: " + str(self.args.directory)
             print "Format to use: "+str(self.args.format)
@@ -31,12 +34,22 @@ class PAudioOrganizer:
                 src = dirpath+"/"+file
                 music_file = audiofile.AudioFile(src)
                 
-                #Making the destination according to format specified.
+                meta_data = [music_file.getArtist(), music_file.getAlbum(), music_file.getTitle()]
                 
+                #Replace metadata if required. like the shitty www.songs.pk.
+                if self.args.editartist is not None:
+                    meta_data[0] = meta_data[0].replace(self.args.editartist[0],self.args.editartist[1])
+                if self.args.editalbum is not None:
+                    meta_data[1] = meta_data[1].replace(self.args.editalbum[0],self.args.editalbum[1])
+                if self.args.edittitle is not None:
+                    meta_data[2] = meta_data[2].replace(self.args.edittitle[0],self.args.edittitle[1])
+                
+                #Making the destination according to format specified.
                 dest = self.args.directory+self.args.format[0]+".mp3"
-                dest = dest.replace("%artist%", music_file.getArtist().replace("/"," "))
-                dest = dest.replace("%album%", music_file.getAlbum().replace("/"," "))
-                dest = dest.replace("%title%", music_file.getTitle().replace("/"," "))
+                #Removing / from filenames as its useless.
+                dest = dest.replace("%artist%", meta_data[0].replace("/"," "))
+                dest = dest.replace("%album%", meta_data[1].replace("/"," "))
+                dest = dest.replace("%title%", meta_data[2].replace("/"," "))
                 
                 if self.args.verbose: print "PERFORMING: " + src + " --> " + dest
                 
