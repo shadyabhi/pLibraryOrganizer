@@ -22,8 +22,8 @@ class PLibraryOrganizer:
     def get_args(self):
         """Get all the arguments from the command line"""
         parser = argparse.ArgumentParser(description="Organizes your library")
-        parser.add_argument('-f', '--format', nargs = 1, required=True, help='Enter format for organizing the music') 
-        parser.add_argument('-d', '--directory', nargs = '?', default = './', help='Enter the directory root. Default is ./')
+        parser.add_argument('-f', '--format', nargs = 1, required=True, default = "%artist% - %title%", help='Enter format for organizing the music') 
+        parser.add_argument('-d', '--directory', nargs = 1, required = True, help='Enter the directory root.')
         parser.add_argument('-v', '--verbose', action='store_true', help='For more verbose output')
         parser.add_argument('-et', '--edittitle', nargs = 2, help="Replace in Title")
         parser.add_argument('-ea', '--editartist', nargs = 2, help="Replace in Artist")
@@ -31,7 +31,10 @@ class PLibraryOrganizer:
         
         self.args = parser.parse_args(sys.argv[1:])
         #Correct the parameters
-        if self.args.directory[-1] is not "/": self.args.directory = self.args.directory+"/"
+        if self.args.directory[0][-1] is not "/": self.args.directory[0] = self.args.directory[0]+"/"
+        if os.path.isdir(self.args.directory[0]) is False:
+            print('Wrong directory provided. Please correct your directory path with "-d" option')
+            sys.exit(1)
         
         if self.args.verbose:
             print("Directory to work on: " + str(self.args.directory))
