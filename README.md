@@ -28,8 +28,9 @@ Also, in the process you want to remove and www.Songs.PK in the titles.
       -h, --help            show this help message and exit
       -f FORMAT, --format FORMAT
                             Enter format for organizing the music
+                            DEFAULT: %artist% - %title%
       -d [DIRECTORY], --directory [DIRECTORY]
-                            Enter the directory root. Default is ./
+                            Enter the directory root.
       -v, --verbose         For more verbose output
       -et EDITTITLE EDITTITLE, --edittitle EDITTITLE EDITTITLE
                             Replace in Title

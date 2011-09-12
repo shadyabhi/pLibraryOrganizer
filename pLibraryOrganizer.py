@@ -37,12 +37,12 @@ class PLibraryOrganizer:
             sys.exit(1)
         
         if self.args.verbose:
-            print("Directory to work on: " + str(self.args.directory))
+            print("Directory to work on: " + str(self.args.directory[0]))
             print("Format to use: "+str(self.args.format))
             
     def recurse_directory(self):
         """Recurse the whole music directory so that we can operate on each file"""
-        for dirpath, dirnames, filenames in os.walk(str(self.args.directory)):
+        for dirpath, dirnames, filenames in os.walk(str(self.args.directory[0])):
             print("Now working in directory -> " + dirpath)
             
             #Delete the directory if its empty in the beginning itself
@@ -57,15 +57,21 @@ class PLibraryOrganizer:
                 meta_data = [music_file.getArtist(), music_file.getAlbum(), music_file.getTitle()]
                 
                 #Replace metadata if required. like the shitty www.songs.pk.
+                #Artist
                 if self.args.editartist is not None:
                     meta_data[0] = meta_data[0].replace(self.args.editartist[0],self.args.editartist[1])
+                    music_file.setArtist(meta_data[0])
+                #Album
                 if self.args.editalbum is not None:
                     meta_data[1] = meta_data[1].replace(self.args.editalbum[0],self.args.editalbum[1])
+                    music_file.setAlbum(meta_data[1])
+                #Title
                 if self.args.edittitle is not None:
                     meta_data[2] = meta_data[2].replace(self.args.edittitle[0],self.args.edittitle[1])
-                
+                    music_file.setTitle(meta_data[2])
+
                 #Making the destination according to format specified.
-                dest = self.args.directory+self.args.format[0]+".mp3"
+                dest = self.args.directory[0]+self.args.format[0]+".mp3"
                 #Removing / from filenames as its useless.
                 dest = dest.replace("%artist%", meta_data[0].replace("/"," "))
                 dest = dest.replace("%album%", meta_data[1].replace("/"," "))

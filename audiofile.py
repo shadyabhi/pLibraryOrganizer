@@ -24,3 +24,15 @@ class AudioFile:
     
     def getLocation(self):
         return self.file_location
+
+    def setArtist(self, artist):
+        self.tag.setArtist(artist)
+        self.tag.update()
+
+    def setAlbum(self, artist):
+        self.tag.setAlbum(album)
+        self.tag.update()
+    
+    def setTitle(self, title):
+        self.tag.setTitle(title)
+        self.tag.update()
