@@ -42,7 +42,7 @@ Also, in the process you want to remove and www.Songs.PK in the titles.
 
 So, you will do something like:
 
-    $python2 pLibraryOrganizer.py -f "%artist%/%artist% - %title%" -d "/home/shadyabhi/music/" -et " - www.Songs.PK"
+    $python2 pLibraryOrganizer.py -f "%artist%/%artist% - %title%" -d "/home/shadyabhi/music/" -et " - www.Songs.PK" ""
 
 
 Hope that script will be of use to you. :)
