@@ -28,20 +28,26 @@ class PLibraryOrganizer:
         parser.add_argument('-et', '--edittitle', nargs = 2, help="Replace in Title")
         parser.add_argument('-ea', '--editartist', nargs = 2, help="Replace in Artist")
         parser.add_argument('-eA', '--editalbum', nargs = 2, help="Replace in Album")
+        parser.add_argument('-dr', '--dryrun', action='store_true', help="Don't move the files. Just show what you are doing")
         
         self.args = parser.parse_args(sys.argv[1:])
         #Correct the parameters
-        if self.args.directory[0][-1] is not "/": self.args.directory[0] = self.args.directory[0]+"/"
+        if not self.args.directory[0].endswith("/"): self.args.directory[0] = self.args.directory[0]+"/"
         if os.path.isdir(self.args.directory[0]) is False:
             print('Wrong directory provided. Please correct your directory path with "-d" option')
             sys.exit(1)
         
+        if self.args.dryrun:
+            self.args.verbose = True
+
         if self.args.verbose:
             print("Directory to work on: " + str(self.args.directory[0]))
             print("Format to use: "+str(self.args.format))
             
     def recurse_directory(self):
         """Recurse the whole music directory so that we can operate on each file"""
+        
+        
         for dirpath, dirnames, filenames in os.walk(str(self.args.directory[0])):
             print("Now working in directory -> " + dirpath)
             
@@ -77,10 +83,15 @@ class PLibraryOrganizer:
                 dest = dest.replace("%album%", meta_data[1].replace("/"," "))
                 dest = dest.replace("%title%", meta_data[2].replace("/"," "))
                 
-                if self.args.verbose: print("PERFORMING: " + src + " --> " + dest)
-                
-                self.move_wrapper(src, dest, music_file)
-                                              
+                if self.args.verbose: 
+                    if src is not dest:
+                        print("PERFORMING: " + src + " --> " + dest)
+               
+                if self.args.dryrun is not True:
+                    self.move_wrapper(src, dest, music_file)
+
+        if self.args.dryrun: print("It is a dry-run. No actual files will be moved")
+
     def move_wrapper(self, src, dest, music_file):
         """Wrapper to move a file which handles all conditions"""
         #Strip the directory name.
