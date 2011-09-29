@@ -95,8 +95,7 @@ class PLibraryOrganizer:
     def move_wrapper(self, src, dest, music_file):
         """Wrapper to move a file which handles all conditions"""
         #Strip the directory name.
-        #TODO: Assumes that filename doesnt contain "/"
-        dest_dir = dest[:dest.rfind("/")]
+        dest_dir = os.path.dirname(dest)
 
         #Check if the directory exists
         if not os.path.exists(dest_dir):
