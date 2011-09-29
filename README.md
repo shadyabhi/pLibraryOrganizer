@@ -23,7 +23,8 @@ To install the eyeD3 module, download the latest release from http://eyed3.nicfi
 Now, extract it and goto "src" directory in the extracted files and rename "__init__.py.in"
 to "__init__.py"
 
-Then, to install the module, 
+Then, to install the module,
+
     $python setup.py.in install
 
 If you get an error similar to python not found, that means that you need to add python

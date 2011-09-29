@@ -24,6 +24,7 @@ class PLibraryOrganizer:
         parser = argparse.ArgumentParser(description="Organizes your library")
         parser.add_argument('-f', '--format', nargs = 1, required=True, default = "%artist% - %title%", help='Enter format for organizing the music') 
         parser.add_argument('-d', '--directory', nargs = 1, required = True, help='Enter the directory root.')
+        parser.add_argument('-D', '--finaldirectory', nargs = 1, help = "Directory to finally move the mp3 files too")
         parser.add_argument('-v', '--verbose', action='store_true', help='For more verbose output')
         parser.add_argument('-et', '--edittitle', nargs = 2, help="Replace in Title")
         parser.add_argument('-ea', '--editartist', nargs = 2, help="Replace in Artist")
@@ -32,8 +33,14 @@ class PLibraryOrganizer:
         
         self.args = parser.parse_args(sys.argv[1:])
         #Correct the parameters
+        self.args.finaldirectory[0] = os.path.join(self.args.finaldirectory[0],"")
+
         if os.path.isdir(self.args.directory[0]) is False:
-            print('Wrong directory provided. Please correct your directory path with "-d" option')
+            print('No directory exists. Please correct your directory path with "-d" option')
+            sys.exit(1)
+
+        if self.args.finaldirectory is not None and os.path.isdir(self.args.finaldirectory[0]) is False:
+            print('No directory exists. Please correct your directory path with "-D" option')
             sys.exit(1)
         
         if self.args.dryrun:
@@ -76,7 +83,12 @@ class PLibraryOrganizer:
                     music_file.setTitle(meta_data[2])
 
                 #Making the destination according to format specified.
-                dest = self.args.directory[0]+self.args.format[0]+".mp3"
+                if self.args.finaldirectory is not None:
+                    dest = self.args.finaldirectory[0]+self.args.format[0]+".mp3"
+                else:
+                    #Means destination directory is the source directory itself"
+                    dest = self.args.directory[0]+self.args.format[0]+".mp3"
+
                 #Removing / from filenames as its useless.
                 dest = dest.replace("%artist%", meta_data[0].replace("/"," "))
                 dest = dest.replace("%album%", meta_data[1].replace("/"," "))
