@@ -6,12 +6,30 @@ This script can be used to manage your music library like iTunes does.
 
 # Installation
 
+On linux:
+
 This is a python script which needs python2. It won't work for python3.
 This script uses eyeD3 module to read the tags so make sure that it is installed.
 
     For ArchLinux,
     $pacman -S python-eyed3
 
+On Windows:
+
+First you need to download eyeD3 module which is a dependancy to the script as 
+its required to read and manipulate tags in the mp3.
+
+To install the eyeD3 module, download the latest release from http://eyed3.nicfit.net/releases/
+Now, extract it and goto "src" directory in the extracted files and rename "__init__.py.in"
+to "__init__.py"
+
+Then, to install the module, 
+    $python setup.py.in install
+
+If you get an error similar to python not found, that means that you need to add python
+to your system path variable. 
+
+    
 # Usage
 
 Suppose, you want your music sorted such that all the mp3s have name as 
