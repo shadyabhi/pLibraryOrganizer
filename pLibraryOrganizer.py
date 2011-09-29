@@ -32,8 +32,6 @@ class PLibraryOrganizer:
         
         self.args = parser.parse_args(sys.argv[1:])
         #Correct the parameters
-        #Add slashes at end if they don't exist
-        self.args.directory[0] = os.path.join(self.args.directory[0], "") 
         if os.path.isdir(self.args.directory[0]) is False:
             print('Wrong directory provided. Please correct your directory path with "-d" option')
             sys.exit(1)
@@ -105,7 +103,7 @@ class PLibraryOrganizer:
         move(src,dest)
         try:
             #This src[:src.rfind("/")] find the path to the file by searching "/" from the right
-            os.rmdir(src[:src.rfind("/")])
+            os.rmdir(os.path.dirname(src))
         except OSError:
             #Directory not empty so we want to pass it until it gets empty.
             pass
