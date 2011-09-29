@@ -33,7 +33,9 @@ class PLibraryOrganizer:
         
         self.args = parser.parse_args(sys.argv[1:])
         #Correct the parameters
-        self.args.finaldirectory[0] = os.path.join(self.args.finaldirectory[0],"")
+        if self.args.finaldirectory is not None:
+            self.args.finaldirectory[0] = os.path.join(self.args.finaldirectory[0],"")
+        self.args.directory[0] = os.path.join(self.args.directory[0],"")
 
         if os.path.isdir(self.args.directory[0]) is False:
             print('No directory exists. Please correct your directory path with "-d" option')
@@ -114,7 +116,7 @@ class PLibraryOrganizer:
         #Now that we have the directories created. Lets move the file itself
         move(src,dest)
         try:
-            if os.path.dirname(src) != self.args.directory[0]:
+            if os.path.join(os.path.dirname(src),"") != self.args.directory[0]:
                 os.rmdir(os.path.dirname(src))
         except OSError:
             #Directory not empty so we want to pass it until it gets empty.
