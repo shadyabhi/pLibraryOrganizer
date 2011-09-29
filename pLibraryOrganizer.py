@@ -114,8 +114,8 @@ class PLibraryOrganizer:
         #Now that we have the directories created. Lets move the file itself
         move(src,dest)
         try:
-            #This src[:src.rfind("/")] find the path to the file by searching "/" from the right
-            os.rmdir(os.path.dirname(src))
+            if os.path.dirname(src) != self.args.directory[0]:
+                os.rmdir(os.path.dirname(src))
         except OSError:
             #Directory not empty so we want to pass it until it gets empty.
             pass
