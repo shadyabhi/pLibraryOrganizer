@@ -32,7 +32,8 @@ class PLibraryOrganizer:
         
         self.args = parser.parse_args(sys.argv[1:])
         #Correct the parameters
-        if not self.args.directory[0].endswith("/"): self.args.directory[0] = self.args.directory[0]+"/"
+        #Add slashes at end if they don't exist
+        self.args.directory[0] = os.path.join(self.args.directory[0], "") 
         if os.path.isdir(self.args.directory[0]) is False:
             print('Wrong directory provided. Please correct your directory path with "-d" option')
             sys.exit(1)
@@ -56,8 +57,8 @@ class PLibraryOrganizer:
                 os.rmdir(dirpath)
                 if self.args.verbose: print dirpath + "deleted as its empty"
 
-            for file in filenames:
-                src = dirpath+"/"+file
+            for mp3_file in filenames:
+                src = os.path.join(dirpath, mp3_file)
                 music_file = audiofile.AudioFile(src)
                 
                 meta_data = [music_file.getArtist(), music_file.getAlbum(), music_file.getTitle()]
