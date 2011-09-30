@@ -9,29 +9,29 @@ import sys
 import os
 from shutil import move
 from sys import version_info, exit
+import logging
 
 #Uses python2
 if sys.version_info>(3,0,0):
         print("Wrong python verion. Its not ported to python3 yet. Use python2")
         exit(1)
 
+logger= logging.getLogger(__file__)
+logging.basicConfig( stream=sys.stdout, level=logging.DEBUG, format='%(filename)s:%(lineno)s %(levelname)s:%(message)s' )
+
 class PLibraryOrganizer:
     def __init__(self):
-        pass
+        self.parser = argparse.ArgumentParser(description="Organizes your library")
+        self.parser.add_argument('-f', '--format', nargs = 1, required=True, default = "%artist% - %title%", help='Enter format for organizing the music') 
+        self.parser.add_argument('-d', '--directory', nargs = 1, required = True, help='Enter the directory root.')
+        self.parser.add_argument('-D', '--finaldirectory', nargs = 1, help = "Directory to finally move the mp3 files too")
+        self.parser.add_argument('-v', '--verbose', action='store_true', help='For more verbose output')
+        self.parser.add_argument('-et', '--edittitle', nargs = 2, help="Replace in Title")
+        self.parser.add_argument('-ea', '--editartist', nargs = 2, help="Replace in Artist")
+        self.parser.add_argument('-eA', '--editalbum', nargs = 2, help="Replace in Album")
+        self.parser.add_argument('-dr', '--dryrun', action='store_true', help="Don't move the files. Just show what you are doing")
 
-    def get_args(self):
-        """Get all the arguments from the command line"""
-        parser = argparse.ArgumentParser(description="Organizes your library")
-        parser.add_argument('-f', '--format', nargs = 1, required=True, default = "%artist% - %title%", help='Enter format for organizing the music') 
-        parser.add_argument('-d', '--directory', nargs = 1, required = True, help='Enter the directory root.')
-        parser.add_argument('-D', '--finaldirectory', nargs = 1, help = "Directory to finally move the mp3 files too")
-        parser.add_argument('-v', '--verbose', action='store_true', help='For more verbose output')
-        parser.add_argument('-et', '--edittitle', nargs = 2, help="Replace in Title")
-        parser.add_argument('-ea', '--editartist', nargs = 2, help="Replace in Artist")
-        parser.add_argument('-eA', '--editalbum', nargs = 2, help="Replace in Album")
-        parser.add_argument('-dr', '--dryrun', action='store_true', help="Don't move the files. Just show what you are doing")
-        
-        self.args = parser.parse_args(sys.argv[1:])
+        self.args = self.parser.parse_args(sys.argv[1:])
         #Correct the parameters
         if self.args.finaldirectory is not None:
             self.args.finaldirectory[0] = os.path.join(self.args.finaldirectory[0],"")
@@ -49,15 +49,25 @@ class PLibraryOrganizer:
             self.args.verbose = True
 
         if self.args.verbose:
-            print("Directory to work on: " + str(self.args.directory[0]))
-            print("Format to use: "+str(self.args.format))
-            
+            logger.debug("Directory to work on: " + str(self.args.directory[0]))
+            logger.debug("Format to use: "+str(self.args.format))
+            logger.debug("Total files to work on: "+str(self.get_total_files()))
+
+    def get_total_files(self):
+        total = 0 
+        for dirpath, dirnames, filenames in os.walk(str(self.args.directory[0])):
+                for f in filenames:
+                    if f[-3:] == "mp3":
+                        total += 1
+        self.total_files = total
+        return self.total_files
+                    
     def recurse_directory(self):
         """Recurse the whole music directory so that we can operate on each file"""
         
-        
+        files_done = 0 #till now
         for dirpath, dirnames, filenames in os.walk(str(self.args.directory[0])):
-            print("Now working in directory -> " + dirpath)
+            #logger.info("Now working in directory -> " + dirpath)
 
             #Delete the directory if its empty in the beginning itself
             if not filenames:
@@ -65,9 +75,14 @@ class PLibraryOrganizer:
                     os.rmdir(dirpath)
                 except OSError: pass
 
-                if self.args.verbose: print dirpath + "deleted as its empty"
-
+                if self.args.verbose: 
+                    logger.debug(dirpath + "deleted as its empty")
+                        
             for mp3_file in filenames:
+                #Operate only on mp3s
+                if mp3_file[-3:] != "mp3": 
+                    continue
+                files_done += 1
                 src = os.path.join(dirpath, mp3_file)
                 music_file = audiofile.AudioFile(src)
                 
@@ -101,12 +116,16 @@ class PLibraryOrganizer:
                 
                 if self.args.verbose: 
                     if src is not dest:
-                        print("PERFORMING: " + src + " --> " + dest)
-               
+                        #print "%d/%d Moving : %s -> %s" % (files_done, self.total_files, src, dest)
+                        sys.stdout.write("\r%d" % files_done)
+                        sys.stdout.write("/%d" % self.total_files)
+                        sys.stdout.write("  %s                               " % dirpath) 
+                        sys.stdout.flush()
                 if self.args.dryrun is not True:
                     self.move_wrapper(src, dest, music_file)
 
-        if self.args.dryrun: print("It is a dry-run. No actual files will be moved")
+        if self.args.dryrun:
+            logger.info("It is a dry-run. No actual files will be moved")
 
     def move_wrapper(self, src, dest, music_file):
         """Wrapper to move a file which handles all conditions"""
@@ -126,10 +145,8 @@ class PLibraryOrganizer:
             pass
         
     def sort(self):
-        self.get_args()
         self.recurse_directory()
         
-
 if __name__ == "__main__":
         app = PLibraryOrganizer()
         app.sort()
