@@ -58,10 +58,13 @@ class PLibraryOrganizer:
         
         for dirpath, dirnames, filenames in os.walk(str(self.args.directory[0])):
             print("Now working in directory -> " + dirpath)
-            
+
             #Delete the directory if its empty in the beginning itself
             if not filenames:
-                os.rmdir(dirpath)
+                try:
+                    os.rmdir(dirpath)
+                except OSError: pass
+
                 if self.args.verbose: print dirpath + "deleted as its empty"
 
             for mp3_file in filenames:
