@@ -29,7 +29,7 @@ class AudioFile:
         self.tag.setArtist(artist)
         self.tag.update()
 
-    def setAlbum(self, artist):
+    def setAlbum(self, album):
         self.tag.setAlbum(album)
         self.tag.update()
     
